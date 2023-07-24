@@ -1,11 +1,351 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
+}
+
+model asistencia_clase_curso_programa {
+  id              Int      @id @default(autoincrement())
+  id_alumno       Int
+  id_curso        Int
+  id_clase        Int
+  id_programa     Int
+  id_proyecto     Int
+  estado          Int
+  motivo          String?  @db.VarChar(255)
+  borrado         Int
+  fecha_ingreso   DateTime @db.Date
+  usuario_ingreso Int
+}
+
+model calificacion {
+  id_calificacion      Int      @id @default(autoincrement())
+  codigo               String   @db.VarChar(255)
+  id_curso             Int
+  nombre               String   @db.VarChar(255)
+  id_modalidad         Int
+  aprendizaje_evaluado String   @db.LongText
+  id_escala            Int
+  borrado              Int
+  fecha_ingreso        DateTime @db.Date
+  usuario_ingreso      Int
+}
+
+model calificacion_curso_programa_proyecto {
+  id              Int      @id @default(autoincrement())
+  id_alumno       Int
+  id_calificacion Int
+  id_curso        Int
+  id_programa     Int
+  id_proyecto     Int
+  nota            String?  @db.VarChar(255)
+  observacion     String?  @db.LongText
+  borrado         Int
+  fecha_ingreso   DateTime @db.Date
+  usuario_ingreso Int
+}
+
+model ciudad {
+  id_ciudad Int    @id @default(autoincrement())
+  nombre    String @db.VarChar(255)
+  borrado   Int
+}
+
+model clase {
+  id_clase             Int      @id @default(autoincrement())
+  id_curso             Int
+  codigo               String   @unique(map: "codigo") @db.VarChar(255)
+  nombre               String   @db.VarChar(255)
+  id_modalidad         Int
+  aprendizaje_esperado String   @db.LongText
+  realizado            Int
+  borrado              Int
+  fecha_ingreso        DateTime @db.Date
+  usuario_ingreso      Int
+}
+
+model clasificacion {
+  id_clasificacion Int      @id @default(autoincrement())
+  nombre           String   @db.VarChar(255)
+  borrado          Int
+  fecha_ingreso    DateTime @db.Date
+  usuario_ingreso  Int
+}
+
+model codigo_curso {
+  id_codigo_curso Int      @id @unique(map: "id_clase_alumno") @default(autoincrement())
+  id_codigo       Int
+  id_curso        Int
+  borrado         Int
+  fecha_ingreso   DateTime @db.Date
+  usuario_ingreso Int
+}
+
+model codigo_sence {
+  id_codigo_sence Int      @id @default(autoincrement())
+  codigo          String   @unique(map: "codigo") @db.VarChar(255)
+  contenido       String   @db.VarChar(255)
+  id_modalidad    Int
+  borrado         Int
+  fecha_ingreso   DateTime @db.Date
+  usuario_ingreso Int
+}
+
+model complemento {
+  id_complemento  Int      @id @default(autoincrement())
+  codigo          Int
+  nombre          Bytes    @db.Blob
+  borrado         Int      @default(0)
+  fecha_ingreso   DateTime @db.Date
+  usuario_ingreso Int
+}
+
+model complemento_curso {
+  id_complemento_curso Int      @id @default(autoincrement())
+  id_complemento       Int
+  id_curso             Int
+  borrado              Int      @default(0)
+  fecha_ingreso        DateTime @db.Date
+  usuario_ingreso      Int
+}
+
+model comuna {
+  id_comuna   Int    @id @default(autoincrement())
+  nombre      String @db.VarChar(255)
+  codigo_area Int
+  borrado     Int
+}
+
+model contacto_empresa {
+  id_contacto_empresa Int      @id @default(autoincrement())
+  id_usuario          Int
+  id_empresa          Int
+  borrado             Int      @default(0)
+  fecha_ingreso       DateTime @db.Date
+  usuario_ingreso     Int
+}
+
+model curso {
+  id_curso             Int      @id @default(autoincrement())
+  codigo               String   @unique(map: "codigo") @db.VarChar(255)
+  nombre               String   @db.VarChar(255)
+  id_modalidad         Int
+  contenido            String   @db.LongText
+  competencias         String   @default("Ninguna") @db.LongText
+  id_clasificacion     Int
+  id_facilitador       Int
+  id_tipo_licencia     Int?
+  aprendizaje_esperado String   @db.LongText
+  horas                Float    @db.Float
+  borrado              Int
+  fecha_ingreso        DateTime @db.Date
+  usuario_ingreso      Int
+}
+
+model curso_clase {
+  id_curso_clase    Int      @id @default(autoincrement())
+  id_programa_curso Int
+  id_clase          Int
+  fecha_clase       DateTime @db.Date
+  borrado           Int
+  fecha_ingreso     DateTime @db.Date
+  usuario_ingreso   Int
+}
+
+model curso_evaluacion {
+  id_curso_evaluacion Int      @id @default(autoincrement())
+  id_programa_curso   Int
+  id_evaluacion       Int
+  fecha_evaluacion    DateTime @db.Date
+  borrado             Int
+  fecha_ingreso       DateTime @db.Date
+  usuario_ingreso     Int
+}
+
+model documento {
+  id_documento    Int      @id @default(autoincrement())
+  nombre          String   @db.VarChar(255)
+  id_usuario      Int
+  entregado       Int
+  documento       String   @db.VarChar(6555)
+  borrado         Int      @default(0)
+  fecha_ingreso   DateTime @db.Date
+  usuario_ingreso Int
+}
+
+model empresa {
+  id_empresa      Int      @id @default(autoincrement())
+  nombre          String   @unique(map: "nombre") @db.VarChar(255)
+  rut             Int      @unique(map: "rut")
+  dv              String   @db.Char(1)
+  id_comuna       Int
+  direccion       String   @db.VarChar(255)
+  descripcion     String   @db.LongText
+  telefono        String   @db.VarChar(255)
+  borrado         Int
+  fecha_ingreso   DateTime @db.Date
+  usuario_ingreso Int
+  correo          String   @db.VarChar(255)
+}
+
+model escala_calificacion {
+  id_escala       Int      @id @default(autoincrement())
+  nombre          String   @db.VarChar(255)
+  borrado         Int
+  fecha_ingreso   DateTime @db.Date
+  usuario_ingreso Int
+}
+
+model genero {
+  id_genero       Int      @id @default(autoincrement())
+  nombre          String   @db.VarChar(255)
+  borrado         Int
+  fecha_ingreso   DateTime @db.Date
+  usuario_ingreso Int
+}
+
+model modalidad {
+  id_modalidad    Int      @id @default(autoincrement())
+  nombre          String   @db.VarChar(255)
+  borrado         Int
+  fecha_ingreso   DateTime @db.Date
+  usuario_ingreso Int
+}
+
+model nacionalidad {
+  id_nacionalidad Int      @id @default(autoincrement())
+  pais_nac        String   @db.VarChar(255)
+  gentilicio_nac  String   @db.VarChar(255)
+  iso_nac         String   @db.VarChar(255)
+  borrado         Int      @default(0)
+  fecha_ingreso   DateTime @default(now()) @db.Date
+  usuario_ingreso Int      @default(1)
+}
+
+model programa {
+  id_programa     Int      @id @default(autoincrement())
+  codigo          String   @unique(map: "codigo") @db.VarChar(255)
+  nombre          String   @db.VarChar(255)
+  objetivo        String   @db.LongText
+  descripcion     String   @db.LongText
+  borrado         Int
+  fecha_ingreso   DateTime @db.Date
+  usuario_ingreso Int
+}
+
+model programa_alumno {
+  id_programa_alumno   Int      @id @default(autoincrement())
+  id_programa          Int
+  id_curso             Int
+  id_usuario_alumno    Int
+  id_proyecto_programa Int
+  id_codigo            Int
+  id_complemento       Int
+  asistencia           Int
+  conectividad         Int      @default(0)
+  registro_contacto    Int      @default(0)
+  cantidad_documentos  Int      @default(0)
+  finaliza             Int      @default(0)
+  deserto              Int      @default(0)
+  motivo_deserta       String   @default("") @db.VarChar(255)
+  borrado              Int      @default(0)
+  fecha_ingreso        DateTime @db.Date
+  usuario_ingreso      Int
+}
+
+model programa_curso {
+  id_programa_curso    Int      @id @default(autoincrement())
+  id_proyecto_programa Int
+  id_programa          Int
+  id_curso             Int
+  inicio               DateTime @db.Date
+  fin                  DateTime @db.Date
+  borrado              Int
+  fecha_ingreso        DateTime @db.Date
+  usuario_ingreso      Int
+}
+
+model proyecto {
+  id_proyecto       Int      @id @default(autoincrement())
+  codigo            String   @unique(map: "codigo") @db.VarChar(255)
+  id_empresa        Int
+  nombre            String   @db.VarChar(255)
+  objetivo          String   @db.LongText
+  descripcion       String   @db.LongText
+  inicio            DateTime @db.Date
+  fin               DateTime @db.Date
+  id_encargado      Int      @default(1)
+  id_unidad_negocio Int      @default(1)
+  borrado           Int
+  fecha_ingreso     DateTime @db.Date
+  usuario_ingreso   Int
+}
+
+model proyecto_programa {
+  id_proyecto_programa Int      @id @default(autoincrement())
+  id_proyecto          Int
+  id_programa          Int
+  inicio               DateTime @db.Date
+  fin                  DateTime @db.Date
+  borrado              Int
+  fecha_ingreso        DateTime @db.Date
+  usuario_ingreso      Int
+}
+
+model reset_password_tokens {
+  id_token         Int      @id @default(autoincrement())
+  id_usuario       Int
+  token            String   @db.VarChar(255)
+  fecha_expiracion DateTime @db.DateTime(0)
+}
+
+model tipo_licencia {
+  id_tipo_licencia Int      @id @default(autoincrement())
+  nombre           String   @db.VarChar(255)
+  descripcion      String   @db.LongText
+  borrado          Int
+  fecha_ingreso    DateTime @db.Date
+  usuario_ingreso  Int
+}
+
+model tipo_usuario {
+  id_tipo_usuario Int      @id @default(autoincrement())
+  nombre          String   @db.VarChar(255)
+  borrado         Int
+  fecha_ingreso   DateTime @db.Date
+  usuario_ingreso Int
+}
+
+model unidad_negocio {
+  id_unidad_negocio Int      @id @default(autoincrement())
+  nombre            String   @db.VarChar(255)
+  borrado           Int
+  fecha_ingreso     DateTime @db.Date
+  usuario_ingreso   Int
+}
+
+model usuario {
+  id_usuario        Int       @id @default(autoincrement())
+  nombre            String    @db.VarChar(255)
+  apellidop         String    @db.VarChar(255)
+  apellidom         String    @db.VarChar(255)
+  fecha_nacimiento  DateTime? @db.Date
+  rut               String?   @unique(map: "rut") @db.VarChar(255)
+  dv                String?   @db.Char(1)
+  es_dni            Int       @default(1) @db.TinyInt
+  id_comuna         String?   @db.VarChar(255)
+  direccion         String?   @db.VarChar(255)
+  telefono          String    @db.VarChar(255)
+  correo            String    @unique(map: "correo") @db.VarChar(255)
+  id_nacionalidad   Int?
+  genero            String    @default("Otro") @db.VarChar(255)
+  id_unidad_negocio Int?
+  contrasenia       String    @db.VarChar(255)
+  id_tipo_usuario   Int
+  borrado           Int
+  fecha_ingreso     DateTime  @db.Date
+  usuario_ingreso   Int
 }

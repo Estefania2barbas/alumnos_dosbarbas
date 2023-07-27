@@ -1,7 +1,24 @@
+import getAllProyecto from '@/lib/proyecto/getAllProyecto'
 import getAllProyectoPrograma from '@/lib/proyectoprograma/getAllProyectoPrograma'
 import React from 'react'
+import { PrismaClient, Prisma } from '@prisma/client'
+const prisma = new PrismaClient()
+
+//@ts-ignore
+
 
 export default async function Proyectos() {
+
+    const empresas= await prisma.empresa.findMany({
+        include: { programas: true }
+    }
+    )
+    
+    /*prisma.proyecto.findMany({
+        include: { programas: true }
+   })*/
+
+
     const listaProyectoPrograma = await getAllProyectoPrograma()
     /*
     type ProyectoPrograma={
@@ -15,38 +32,14 @@ export default async function Proyectos() {
     "usuario_ingreso": number
     }
     */
+
+    const listaProyecto = await getAllProyecto()
+    listaProyecto[0].programas[0]
     return (
         <>
-            <table className="table">
-                <thead>
-                    <tr>
-                        <th scope="col">id_proyecto_programa</th>
-                        <th scope="col">id_proyecto</th>
-                        <th scope="col">id_programa</th>
-                        <th scope="col">inicio</th>
-                        <th scope="col">borrado</th>
-                        <th scope="col">fecha_ingreso</th>
-                        <th scope="col">usuario_ingreso</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {
-                        listaProyectoPrograma.map(proyectoprograma => (
-                            <tr key={proyectoprograma.id_proyecto_programa}>
-                                <th scope="row">{proyectoprograma.id_proyecto_programa}</th>
-                                <td>{proyectoprograma.id_proyecto}</td>
-                                <td>{proyectoprograma.id_programa}</td>
-                                <td>{proyectoprograma.inicio}</td>
-                                <td>{proyectoprograma.borrado}</td>
-                                <td>{proyectoprograma.fecha_ingreso}</td>
-                                <td>{proyectoprograma.usuario_ingreso}</td>
-                            </tr>
-                        ))
-                    }
-  
-
-                </tbody>
-            </table>
+        <pre>
+         {JSON.stringify(empresas,null,2)}
+        </pre>       
         </>
     )
 }

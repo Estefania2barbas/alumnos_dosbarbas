@@ -1,0 +1,1 @@
+type Alumno=import("@prisma/client").Usuario

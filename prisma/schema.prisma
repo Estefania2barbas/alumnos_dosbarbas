@@ -177,18 +177,19 @@ model documento {
 }
 
 model empresa {
-  id_empresa      Int      @id @default(autoincrement())
-  nombre          String   @unique(map: "nombre") @db.VarChar(255)
-  rut             Int      @unique(map: "rut")
-  dv              String   @db.Char(1)
+  id_empresa      Int        @id @default(autoincrement())
+  nombre          String     @unique(map: "nombre") @db.VarChar(255)
+  rut             Int        @unique(map: "rut")
+  dv              String     @db.Char(1)
   id_comuna       Int
-  direccion       String   @db.VarChar(255)
-  descripcion     String   @db.LongText
-  telefono        String   @db.VarChar(255)
+  direccion       String     @db.VarChar(255)
+  descripcion     String     @db.LongText
+  telefono        String     @db.VarChar(255)
   borrado         Int
-  fecha_ingreso   DateTime @db.Date
+  fecha_ingreso   DateTime   @db.Date
   usuario_ingreso Int
-  correo          String   @db.VarChar(255)
+  correo          String     @db.VarChar(255)
+  programas       proyecto[]
 }
 
 model escala_calificacion {
@@ -226,14 +227,15 @@ model nacionalidad {
 }
 
 model programa {
-  id_programa     Int      @id @default(autoincrement())
-  codigo          String   @unique(map: "codigo") @db.VarChar(255)
-  nombre          String   @db.VarChar(255)
-  objetivo        String   @db.LongText
-  descripcion     String   @db.LongText
+  id_programa     Int                 @id @default(autoincrement())
+  codigo          String              @unique(map: "codigo") @db.VarChar(255)
+  nombre          String              @db.VarChar(255)
+  objetivo        String              @db.LongText
+  descripcion     String              @db.LongText
   borrado         Int
-  fecha_ingreso   DateTime @db.Date
+  fecha_ingreso   DateTime            @db.Date
   usuario_ingreso Int
+  proyectos       proyecto_programa[]
 }
 
 model programa_alumno {
@@ -269,24 +271,28 @@ model programa_curso {
 }
 
 model proyecto {
-  id_proyecto       Int      @id @default(autoincrement())
-  codigo            String   @unique(map: "codigo") @db.VarChar(255)
+  id_proyecto       Int                 @id @default(autoincrement())
+  codigo            String              @unique(map: "codigo") @db.VarChar(255)
   id_empresa        Int
-  nombre            String   @db.VarChar(255)
-  objetivo          String   @db.LongText
-  descripcion       String   @db.LongText
-  inicio            DateTime @db.Date
-  fin               DateTime @db.Date
-  id_encargado      Int      @default(1)
-  id_unidad_negocio Int      @default(1)
+  nombre            String              @db.VarChar(255)
+  objetivo          String              @db.LongText
+  descripcion       String              @db.LongText
+  inicio            DateTime            @db.Date
+  fin               DateTime            @db.Date
+  id_encargado      Int                 @default(1)
+  id_unidad_negocio Int                 @default(1)
   borrado           Int
-  fecha_ingreso     DateTime @db.Date
+  fecha_ingreso     DateTime            @db.Date
   usuario_ingreso   Int
+  programas         proyecto_programa[]
+  empresa           empresa?            @relation(fields: [id_empresa], references: [id_empresa])
 }
 
 model proyecto_programa {
   id_proyecto_programa Int      @id @default(autoincrement())
+  proyecto             proyecto @relation(fields: [id_proyecto], references: [id_proyecto])
   id_proyecto          Int
+  programa             programa @relation(fields: [id_programa], references: [id_programa])
   id_programa          Int
   inicio               DateTime @db.Date
   fin                  DateTime @db.Date
@@ -311,41 +317,62 @@ model tipo_licencia {
   usuario_ingreso  Int
 }
 
-model tipo_usuario {
-  id_tipo_usuario Int      @id @default(autoincrement())
-  nombre          String   @db.VarChar(255)
-  borrado         Int
-  fecha_ingreso   DateTime @db.Date
-  usuario_ingreso Int
+model TipoUsuario {
+  id                 Int               @id @default(autoincrement()) @map("id_tipo_usuario")
+  nombre             NombreTipoUsuario
+  borrado            Int               @default(0)
+  fechaIngreso       DateTime          @map("fecha_ingreso") @db.Date
+  idUsuarioIngreso   Int               @map("usuario_ingreso")
+  usuariosDeEsteTipo Usuario[]
+
+  @@map("tipo_usuario")
 }
 
-model unidad_negocio {
-  id_unidad_negocio Int      @id @default(autoincrement())
-  nombre            String   @db.VarChar(255)
-  borrado           Int
-  fecha_ingreso     DateTime @db.Date
-  usuario_ingreso   Int
+enum NombreTipoUsuario {
+  ADMINISTRADOR           @map(name: "Administrador")
+  ALUMNO                  @map(name: "Alumno")
+  CLIENTE                 @map(name: "Cliente")
+  ADMINISTRATIVO          @map(name: "Administrativo")
+  FACILITADOR             @map(name: "Facilitador")
+  RELACIONADO             @map(name: "Relacionado")
+  CONTACTO                @map(name: "Contacto")
+  FINANZAS_MASTER         @map(name: "Finanzas Master")
+  FINANZAS                @map(name: "Finanzas")
+  FINANZAS_ADMINISTRATIVO @map(name: "Finanzas Administrativo")
 }
 
-model usuario {
-  id_usuario        Int       @id @default(autoincrement())
-  nombre            String    @db.VarChar(255)
-  apellidop         String    @db.VarChar(255)
-  apellidom         String    @db.VarChar(255)
-  fecha_nacimiento  DateTime? @db.Date
-  rut               String?   @unique(map: "rut") @db.VarChar(255)
-  dv                String?   @db.Char(1)
-  es_dni            Int       @default(1) @db.TinyInt
-  id_comuna         String?   @db.VarChar(255)
-  direccion         String?   @db.VarChar(255)
-  telefono          String    @db.VarChar(255)
-  correo            String    @unique(map: "correo") @db.VarChar(255)
-  id_nacionalidad   Int?
-  genero            String    @default("Otro") @db.VarChar(255)
-  id_unidad_negocio Int?
-  contrasenia       String    @db.VarChar(255)
-  id_tipo_usuario   Int
-  borrado           Int
-  fecha_ingreso     DateTime  @db.Date
-  usuario_ingreso   Int
+model UnidadNegocio {
+  id               Int      @id @default(autoincrement()) @map("id_unidad_negocio")
+  nombre           String   @db.VarChar(255)
+  borrado          Int      @default(0)
+  fechaIngreso     DateTime @map("fecha_ingreso") @db.Date
+  idUsuarioIngreso Int      @map("usuario_ingreso")
+
+  @@map("unidad_negocio")
+}
+
+model Usuario {
+  id               Int          @id @default(autoincrement()) @map("id_usuario")
+  nombre           String       @db.VarChar(255)
+  apellidoPaterno  String       @map("apellidop") @db.VarChar(255)
+  apellidoMaterno  String       @map("apellidom") @db.VarChar(255)
+  fechaNacimiento  DateTime?    @map("fecha_nacimiento") @db.Date
+  rut              String?      @unique(map: "rut") @db.VarChar(255)
+  dv               String?      @db.Char(1)
+  esDNI            Int          @default(1) @map("es_dni") @db.TinyInt
+  idComuna         String?      @map("id_comuna") @db.VarChar(255)
+  direccion        String?      @db.VarChar(255)
+  telefono         String       @db.VarChar(255)
+  correo           String       @unique(map: "correo") @db.VarChar(255)
+  idNacionalidad   Int?         @map("id_nacionalidad")
+  genero           String       @default("Otro") @db.VarChar(255)
+  idUnidadNegocio  Int?         @map("id_unidad_negocio")
+  password         String       @map("contrasenia") @db.VarChar(255)
+  tipoUsuario      TipoUsuario? @relation(fields: [idTipoUsuario], references: [id])
+  idTipoUsuario    Int          @map("id_tipo_usuario")
+  borrado          Int          @default(0)
+  fechaIngreso     DateTime     @map("fecha_ingreso") @db.Date
+  idUsuarioIngreso Int          @map("usuario_ingreso")
+
+  @@map("usuario")
 }
